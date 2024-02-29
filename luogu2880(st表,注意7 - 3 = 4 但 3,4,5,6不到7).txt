@@ -1,0 +1,45 @@
+#include <bits/stdc++.h>
+#define ll long long
+using namespace std;
+
+const int N = 1e7 + 10;
+int ax[N][21];
+int in[N][21];
+
+int n, q;
+
+void bd() {
+	for (int l = 1; l <= 19; l++) {
+		for (int i = 1; i <= n; i++) {
+			ax[i][l] = max(ax[i][l - 1], ax[i + (1 << l - 1)][l - 1]);
+			in[i][l] = min(in[i][l - 1], in[i + (1 << l - 1)][l - 1]);
+		}
+	}
+}
+// i, l -> i ~ (i + (1 << l) - 1) 
+// 2,1 -> 2,0 3,0
+// 2,2 -> 2,1 4,1
+int main() {
+	cin >> n >> q;
+	for (int i = 1; i <= n; i++) {
+		int x;
+		cin >> x;
+		ax[i][0] = x;
+		in[i][0] = x;
+	}
+	bd();
+
+	for (int i = 1; i <= q; i++) {
+		int x, y;
+		cin >> x >> y;
+		if (x == y) {
+			cout << 0 << endl;
+			continue;
+		}
+		int j;
+		for (j = 20; x + (1 << j) > y; j--);
+		int mx = max(ax[x][j], ax[y - (1 << j) + 1][j]);
+		int mn = min(in[x][j], in[y - (1 << j) + 1][j]);
+		cout << mx - mn << endl;
+	}
+}

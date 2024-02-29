@@ -1,0 +1,29 @@
+ax = 1 (mod b)
+(a,b互素是存在逆元的充要条件)
+
+已知 a 与 a mod b 逆元是一样的
+实际先要用a mod b 代替 a
+
+令  0<= a <= b-1
+
+则设 b = ak + r
+
+两边对b取模 ak + r = 0 (mod b)
+
+两边乘以 a, r对b的逆元 (0*any = 0)
+
+----设inv(x)为x对b的逆元----
+
+则k * inv(r) + inv(a) = 0(mod b)
+
+则 inv(a) = -k* inv(r) = -b/a * inv(b mod a)  (mod b)
+	 = (b - b / a ) * inv(b mod a)  (mod b) 
+
+// a是求的，b是模的
+int inv(int a,int b){
+        if(a == 0) return modb[a] = -1;
+        if(a == 1) return modb[a] = 1;
+        if(modb[a]) return modb[a];
+        return modb[a] = (b - b / a) * inv(b % a, b) % b;
+} 
+

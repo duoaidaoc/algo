@@ -1,0 +1,116 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <cstdlib>
+#include <queue>
+#include <vector>
+#include <unordered_map>
+#include <map>
+#include <stack>
+#include <set>
+#include <algorithm>
+using namespace std;
+
+unordered_map<int, int>mp[2510];
+int dn[2510];
+
+void op_U(set<int>& a, set<int>& b) {
+	if (b.size() > a.size())
+		swap(a, b);
+	for (auto& bs : b) {
+		a.insert(bs);
+	}
+}
+
+void op_N(set<int>& a, set<int>& b) {
+	set<int>tmp;
+	if (a.size() > b.size())
+		swap(a, b);
+	for (auto it = a.begin(); it != a.end(); it++) {
+		if (b.count(*it))
+			tmp.insert(*it);
+	}
+	swap(a, tmp);
+}
+int main() {
+	int n, m;
+	cin >> n;
+	for (int i = 1; i <= n; i++) {
+		int x;
+		cin >> x;
+		dn[i] = x;
+		cin >> x;
+		for (int j = 1; j <= x; j++) {
+			int a, b;
+			cin >> a >> b;
+			mp[i][a] = b;
+
+		}
+	}
+
+	cin >> m;
+	for (int i = 1; i <= m; i++) {
+		string str;
+		cin >> str;
+		stack<set<int>>st;
+		stack<char>op;
+		int cnt[10000] = { 0 };
+		
+		for (int it = 0;it<str.size();it++) {
+			if (str[it] == '(' || str[it] == ')')
+				continue;
+			if (isdigit(str[it])) {
+				int a = 0;
+				while (isdigit(str[it])) {
+					a = a * 10 + str[it] - '0';
+					it++;
+				}
+				int tp = str[it];
+				it++;
+				int b = 0;
+				while (isdigit(str[it])) {
+					b = b * 10 + str[it] - '0';
+					it++;
+				}
+				set<int>ok;
+				for (int j = 1; j <= n; j++) {
+					if (tp == ':') {
+						if(mp[j].find(a) != mp[j].end() && mp[j][a] == b)
+							ok.insert(dn[j]);
+					}
+					else {
+						if (mp[j].find(a) != mp[j].end() && mp[j][a] != b)
+							ok.insert(dn[j]);
+					}
+				}
+				st.push(ok);
+				cnt[op.size()]++;
+				while (cnt[op.size()] == 2) {
+					cnt[op.size()] = 0;
+					char ch = op.top(); op.pop();
+					auto ok1 = st.top(); st.pop();
+					auto ok2 = st.top(); st.pop();
+					if (ch == '|') {
+						op_U(ok1, ok2);
+					}
+					else {
+						op_N(ok1, ok2);
+					}
+					st.push(ok1);
+					cnt[op.size()]++;
+				}
+			}
+			else if (str[it] == '|' || str[it] == '&') {
+				op.push(str[it]);
+			}
+		}
+		vector<int>ans;
+		for (auto& aa : st.top()) {
+			ans.push_back(aa);
+		}
+		sort(ans.begin(), ans.end());
+		for (auto an : ans) {
+			cout << an << ' ';
+		}
+		cout << endl;
+	}
+}

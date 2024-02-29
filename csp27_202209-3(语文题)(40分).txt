@@ -1,0 +1,79 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <cstdlib>
+#include <cstring>
+#include <queue>
+#include <vector>
+#include <unordered_map>
+#include <map>
+#include <stack>
+#include <set>
+#include <algorithm>
+#include <array>
+//#include <bits/stdc++.h>
+using namespace std;
+
+
+unordered_map<int, pair<int, int>>mp;
+set<int>date;
+vector<pair<pair<int, int>,int>>su;
+
+
+int main() {
+	int n;
+	cin >> n;
+	for (int i = 0; i <= n - 1; i++) {
+		int r, m;
+		cin >> r >> m;
+		unordered_map<int, int>visd;
+		for (int j = 1; j <= r; j++) {
+			int x;
+			cin >> x;
+			if (visd[x])continue;
+			visd[x] = 1;
+			if (date.count(x)) {
+				mp[x].second = 8;
+			}
+			else {
+				date.insert(x);
+				mp[x].first = i;
+				mp[x].second = 8;
+			}
+		}
+		set<int>tmp;
+		for (auto& ele : date) {
+			if (mp[ele].second == 1) {
+				mp[ele].first = 0;
+				mp[ele].second = 0;
+			}
+			else {
+				mp[ele].second--;
+				tmp.insert(ele);
+			}
+		}
+		date.swap(tmp);
+		vector<pair<pair<int, int>,int>>tmpv;
+		for (auto& peo : su) {
+			if (date.count(peo.second) && peo.first.second >= i - 6)
+				tmpv.push_back(peo);
+		}
+		su.swap(tmpv);
+		for (int j = 1; j <= m; j++) {
+			int x, y, z;
+			cin >> x >> y >> z;
+			if (date.count(z) == 0)continue;
+			else if (mp[z].first > x)continue;
+			su.push_back({ {y, x}, z });
+		}
+		sort(su.begin(), su.end());
+		su.erase(unique(su.begin(), su.end()), su.end());
+		unordered_map<int, int>vis;
+		cout << i;
+		for (auto& peo : su) {
+			if (vis[peo.first.first])continue;
+			vis[peo.first.first] = 1;
+			cout << ' ' << peo.first.first;
+		}
+		cout << endl;
+	}
+}

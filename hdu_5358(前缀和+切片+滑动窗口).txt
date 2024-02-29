@@ -1,0 +1,69 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <cstdlib>
+#include <queue>
+#include <vector>
+#include <unordered_map>
+#include <map>
+#include <stack>
+#include <set>
+#include <algorithm>
+using namespace std;
+//const int N = 50005;
+const int M = 60;
+#define ll long long
+int n, t;
+
+ll lb, rb;
+vector<ll>a, s;
+ll r[M];
+ll l[M];
+void init() {
+	l[1] = 0, r[1] = 1;
+
+	for (int i = 2; i <= 35; i++) {
+		l[i] = 1ll << (i - 1);
+		r[i] = ((1ll << i) - 1);
+	}
+}
+
+int main() {
+	init();
+	cin >> t;
+	while (t--) {
+		a.clear();
+		s.clear();
+		cin >> n;
+		a.push_back(0);
+		s.push_back(0);
+		for (int i = 1; i <= n; i++) {
+			ll x;
+			cin >> x;
+			a.push_back(x);
+			s.push_back(s[i - 1] + a[i]);
+		}
+		ll ans = 0;
+		for (int k = 0; k <= 34; k++) {
+			if (s[n] < l[k])
+				break;
+			ll lft = 1;
+			ll rit = 0;
+			for (int i = 1; i <= n; i++) {
+				lb = l[k] + s[i - 1];
+				if (s[n] < lb)
+					break;
+				rb = r[k] + s[i - 1];
+				lft = max(lft, (ll)i);
+				while (lft <= n &&s[lft] < lb)lft++;
+				rit = max(lft , rit);
+				while (rit <= n &&s[rit] <= rb)rit++;
+				rit--;
+				if (rit >= lft) {
+					ll tmp = (rit - lft + 1) * i * k + (lft + rit) * (rit - lft + 1) / 2 * k;
+					ans += tmp;
+				}
+			}
+		}
+		cout << ans << endl;
+	}
+}

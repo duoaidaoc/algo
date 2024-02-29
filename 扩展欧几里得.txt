@@ -1,0 +1,8 @@
+假设任意数a ，b
+要求ax + by = gcd(a, b)的任意一组可行解
+由某结论可知,gcd(a, b) = gcd(b, a mod b)
+故得到第二个方程
+bx + (a mod b)y = gcd(b, a mod b) = gcd(a, b)
+
+无限套娃，最终a mod b = 0
+则 bx = gcd(b,0)

@@ -1,0 +1,90 @@
+#include <bits/stdc++.h>
+#include <array>
+
+#define ll long long
+
+using namespace std;
+const int N = 300020;
+int a[N];
+int cnt[N];
+ll ans = 0;//相同袜子平方和
+
+struct zz {
+	int l, r, seq, bel;
+}qe[N];
+ll so[N], mo[N];
+
+ll gcd(ll x, ll y) {
+	if (!y)return x;
+	return gcd(y, x % y);
+}
+
+bool cmp(zz &x, zz &y) {
+	if (x.bel == y.bel)return x.r < y.r;
+	return x.bel < y.bel;
+}
+
+void add(int x) {
+	if (x == 0)return;
+	ans -= max(0, cnt[a[x]] * (cnt[a[x]] - 1));
+	cnt[a[x]]++;
+	ans += max(0, cnt[a[x]] * (cnt[a[x]] - 1));
+}
+
+void del(int x) {
+	if (x == 0)return;
+	ans -= max(0, cnt[a[x]] * (cnt[a[x]] - 1));
+	cnt[a[x]]--;
+	ans += max(0, cnt[a[x]] * (cnt[a[x]] - 1));
+}
+
+int main() {
+	int n, q;
+	cin >> n >> q;
+	for (int i = 1; i <= n; i++) {
+		cin >> a[i];
+	}
+	int t = 0;
+	int mod = int(sqrt(n));
+	for (int i = 1; i <= q; i++) {
+		int x, y;
+		cin >> x >> y;
+		qe[i] = { x,y,i,x / mod };
+	}
+	sort(qe + 1, qe + q + 1, cmp);
+	int l = 0, r = 0;
+	for (int i = 1; i <= q; i++) {
+		if (qe[i].r == qe[i].l) {
+			so[qe[i].seq] = 0;
+			mo[qe[i].seq] = 1;
+			continue;
+		}
+		while (r < qe[i].r) {
+			r++;
+			add(r);
+			//cout << l << ' ' << r << ' ' << ans << '\n';
+		}
+		while (r > qe[i].r) {
+			del(r);
+			r--;
+			//cout << l << ' ' << r << ' ' << ans << '\n';
+		}
+		while (l < qe[i].l) {
+			del(l);
+			l++;
+			//cout << l << ' ' << r << ' ' << ans << '\n';
+		}
+		while (l > qe[i].l) {
+			l--;
+			add(l);
+			//cout << l << ' ' << r << ' ' << ans << '\n';
+		}
+		ll _ = gcd(ans, 1ll * (r - l + 1) * (r - l));
+		so[qe[i].seq] = ans / _;		
+		mo[qe[i].seq] = 1ll * (r - l + 1) * (r - l) / _;
+	}
+	for (int i = 1; i <= q; i++) {
+		cout << so[i] << '/' << mo[i] << '\n';
+	}
+}
+

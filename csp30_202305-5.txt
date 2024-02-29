@@ -1,0 +1,89 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+typedef pair<int, int> pii;
+typedef pair<int, pair<int, int>> tii;
+
+#define N 1000007
+#define fr first
+#define sc second
+#define mp make_pair
+
+char s[N];
+
+int val[1000];
+
+int st[N], ed[N], w[N], len[N];
+
+int S, df[26][26], dis[26][26][1024];
+
+vector<pii> e[26][1024];
+
+priority_queue<tii, vector<tii>, greater<tii>> q;
+
+bool vis[26][1024];
+
+void dij(int u) {
+	memset(vis, 0, sizeof(vis));
+	int nw = u;
+	dis[u][u][0] = 0;
+	q.push(mp(0, mp(u, 0)));
+	while (!q.empty()) {
+		pii cur = q.top().sc; q.pop();
+		u = cur.fr;
+		int s = cur.sc;
+		if (vis[u][s]) continue; vis[u][s] = true;
+		//printf("%d -> %d, %d : %d\n", nw, u, s, dis[nw][u][s]);
+		for (int i = 0; i < 26; ++i)
+			if (dis[nw][i][s] > dis[nw][u][s] + df[u][i]) {
+				dis[nw][i][s] = dis[nw][u][s] + df[u][i];
+				q.push(mp(dis[nw][i][s], mp(i, s)));
+			}
+		for (int _s = 0; _s <= S; ++_s)
+			if ((_s | s) != s) {
+				int tar = (s | _s);
+				for (auto ed : e[u][_s]) {
+					int v = ed.fr, l = ed.sc;
+					if (dis[nw][v][tar] > dis[nw][u][s] + l) {
+						dis[nw][v][tar] = dis[nw][u][s] + l;
+						q.push(mp(dis[nw][v][tar], mp(v, tar)));
+					}
+				}
+			}
+	}
+}
+
+int main() {
+	int n; scanf("%d", &n);
+	scanf("%s", s + 1);
+	int m = strlen(s + 1);
+	S = (1 << m) - 1;
+	for (int i = 0; i < m; ++i) val[s[i + 1]] = (1 << i);
+	memset(df, 0x3f, sizeof(df));
+	memset(dis, 0x3f, sizeof(dis));
+	int inf = df[0][0];
+	for (int i = 0; i < 26; ++i) df[i][i] = 0;
+	for (int i = 1; i <= n; ++i) {
+		scanf("%s", s + 1);
+		len[i] = strlen(s + 1);
+		st[i] = s[1] - 'a';
+		ed[i] = s[len[i]] - 'a';
+		for (int j = len[i]; j; --j) w[i] |= val[s[j]];
+		--len[i];
+		df[st[i]][ed[i]] = min(df[st[i]][ed[i]], len[i]);
+		e[st[i]][w[i]].push_back(mp(ed[i], len[i]));
+		//printf("%d %d %d %d\n", len[i], st[i], ed[i], w[i]);
+	}
+	for (int k = 0; k < 26; ++k)
+		for (int i = 0; i < 26; ++i)
+			for (int j = 0; j < 26; ++j)
+				df[i][j] = min(df[i][j], df[i][k] + df[k][j]);
+	for (int i = 0; i < 26; ++i) dij(i);
+	for (int i = 1; i <= n; ++i) {
+		int ans = inf;
+		for (int s = 0; s <= S; ++s)
+			if ((s | w[i]) == S) ans = min(ans, len[i] + dis[ed[i]][st[i]][s]);
+		printf("%d\n", ans < inf ? ans : -1);
+	}
+	return 0;
+}
